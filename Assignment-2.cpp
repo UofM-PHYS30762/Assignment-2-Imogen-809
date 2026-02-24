@@ -67,6 +67,7 @@ int main(){
     }
 
     vector<double> values;
+    vector<string> course_names;
     double mark;
     int code;
     string course_name;
@@ -75,11 +76,25 @@ int main(){
     while(my_file >> mark >> code){
         values.push_back(mark);
         getline(my_file, course_name);  // discard rest of line
+        course_names.push_back(course_name); // store course name in a separate vector
+
     }
 
     // counts and prints number of entries in the open file 
     int number_of_entries{count_entries(values)};
     cout<<"Number of entries:"<<number_of_entries<<endl;
+
+        // Ask user if they want course names included
+    string include_courses;
+    cout << "Do you want to include course names when displaying results? (y/n): ";
+    cin >> include_courses;
+
+    if (include_courses == "y" || include_courses == "Y") {
+        cout << "Grades with course names:";
+        for (int i = 0; i < number_of_entries; ++i) {
+            cout << values[i] << " - " << course_names[i] << endl;
+        }
+    }
 
     // Reset file before we do anything else, as the file pointer is at the end of the file after counting entries, we need to reset it to the beginning of the file before we can read it again
     my_file.clear();
@@ -95,6 +110,7 @@ int main(){
     //------------ stats for a specific year --------------
 
     vector<double> year_values;
+    vector<string> year_course_names;
     double year_mark;
     int year_code;
     string year_course_name;
@@ -103,7 +119,14 @@ int main(){
     int year;
     cout<<"Enter year (1-4) to get stats for that year:"<<endl;
     cin>>year;
-   
+
+
+    // ask the user if they want course names included for the year stats
+    string year_include_courses;
+    cout << "Do you want to include course names when displaying results? (y/n): ";
+    cin >> year_include_courses;
+
+
     // select the data for the selected year and store it in a new vector
     while(my_file >> year_mark >> year_code){
 
@@ -111,23 +134,34 @@ int main(){
 
     if(first_digit == year){
         year_values.push_back(year_mark);
+        getline(my_file, year_course_name);
+        year_course_names.push_back(year_course_name);
     }
 
     getline(my_file, year_course_name);
 }
+
+
     // calulate number of entries for that year
     int year_entries{count_entries(year_values)};
+
+    if (year_include_courses == "y" || year_include_courses == "Y") {
+        cout << "Grades with course names:";
+        for (int i = 0; i < year_entries; ++i) {
+            cout << year_values[i] << " - " << year_course_names[i] << endl;
+        }
+    }
 
     // calculate and print mean value, the grades are stored in the first column of the file, so we access it using my_file[0]
     double year_mean_val{mean(year_values, year_entries)};
     cout<<"Year "<<year<<" Mean:"<<year_mean_val<<endl;
 
     // calculate and print standard deviation
-    double year_std_dev{standard_deviation(year_values, number_of_entries)};
+    double year_std_dev{standard_deviation(year_values, year_entries)};
     cout<<"Year "<<year<<" Standard Deviation:"<<year_std_dev<<endl;
 
     // calculate and print standard error
-    double year_std_err{standard_error(year_values, number_of_entries)};
+    double year_std_err{standard_error(year_values, year_entries)};
     cout<<"Year "<<year<<" Standard Error:"<<year_std_err<<endl;
 
 
