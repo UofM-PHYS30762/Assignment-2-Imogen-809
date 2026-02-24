@@ -7,24 +7,24 @@
 using namespace std;
 
 
-double mean(const vector<double>& vals){
+double mean(const vector<double>& vals, int num_entries){
     double sum = 0.0;
     for(double val : vals){
         sum += val;
     }
-    return sum / vals.size();
+    return sum / num_entries;
 
 }
 
-double standard_deviation(const vector<double>& vals){
-    double mean_val = mean(vals);
+double standard_deviation(const vector<double>& vals, int num_entries){
+    double mean_val = mean(vals, num_entries);
     double sum_squared_diff = 0.0;
 
     for(double val : vals){
         sum_squared_diff += (val - mean_val) * (val - mean_val);
     }
 
-    return sqrt(sum_squared_diff / vals.size());
+    return sqrt(sum_squared_diff / num_entries);
 
 }
 int count_entries(ifstream& my_file){
@@ -67,18 +67,21 @@ int main(){
 
     // Read numbers into vector
     vector<double> values;
-    double number;
+    double mark;
+    int code;
+    string course_name;
 
-    while(my_file >> number){
-        values.push_back(number);
+    while(my_file >> mark >> code){
+        values.push_back(mark);
+        getline(my_file, course_name);  // discard rest of line
     }
 
     // calculate and print mean value, the grades are stored in the first column of the file, so we access it using my_file[0]
-    double mean_val{mean(values)};
+    double mean_val{mean(values, number_of_entries)};
     cout<<"Mean:"<<mean_val<<endl;
 
     // calculate and print standard deviation
-    double std_dev{standard_deviation(values)};
+    double std_dev{standard_deviation(values, number_of_entries)};
     cout<<"Standard Deviation:"<<std_dev<<endl;
 
 
