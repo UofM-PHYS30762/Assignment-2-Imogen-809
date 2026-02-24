@@ -2,17 +2,31 @@
 #include<fstream>
 #include<string>
 #include<vector>
+#include<cmath>
 
 using namespace std;
 
-// void standard_deviation(vector<double>& vals){
 
-// }
+double mean(const vector<double>& vals){
+    double sum = 0.0;
+    for(double val : vals){
+        sum += val;
+    }
+    return sum / vals.size();
 
-// void mean(vector<double>& vals){
+}
 
-// }
+double standard_deviation(const vector<double>& vals){
+    double mean_val = mean(vals);
+    double sum_squared_diff = 0.0;
 
+    for(double val : vals){
+        sum_squared_diff += (val - mean_val) * (val - mean_val);
+    }
+
+    return sqrt(sum_squared_diff / vals.size());
+
+}
 int count_entries(ifstream& my_file){
     int count = 0;
     string line;
@@ -46,6 +60,27 @@ int main(){
     // counts and prints number of entries in the open file 
     int number_of_entries{count_entries(my_file)};
     cout<<"Number of entries:"<<number_of_entries<<endl;
+
+    // Reset file before we do anything else, as the file pointer is at the end of the file after counting entries, we need to reset it to the beginning of the file before we can read it again
+    my_file.clear();
+    my_file.seekg(0);
+
+    // Read numbers into vector
+    vector<double> values;
+    double number;
+
+    while(my_file >> number){
+        values.push_back(number);
+    }
+
+    // calculate and print mean value, the grades are stored in the first column of the file, so we access it using my_file[0]
+    double mean_val{mean(values)};
+    cout<<"Mean:"<<mean_val<<endl;
+
+    // calculate and print standard deviation
+    double std_dev{standard_deviation(values)};
+    cout<<"Standard Deviation:"<<std_dev<<endl;
+
 
     return 0;
 
