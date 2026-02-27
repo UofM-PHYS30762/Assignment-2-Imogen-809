@@ -43,7 +43,7 @@ double stats(const vector<double>& vals, int num_entries){
     cout<<"Standard Deviation:"<<std_dev<<endl;
     cout<<"Standard Error:"<<std_err<<endl;
 
-    return 0.0; // we return 0.0 because we are not actually returning any value, we are just printing the stats to the console
+    return 0.0;
 }
 int count_entries(const vector<double>& vals){
     return vals.size();
@@ -79,9 +79,18 @@ bool order_entries(const Course* a,
 }
 
 int main(){
-    //Open file to read and write
-    ifstream my_file; // a file created for reading and writing 
-    my_file.open("course_marks.dat"); // opens a file called 'data1.dat
+    // set up constants
+    vector<double> values;
+    vector<string> course_names;
+    vector<Course*> total_course_data; 
+    string course_name;
+    double mark;
+    int code;
+    string total_sort_choice;
+
+    // open file to read and write
+    ifstream my_file; // a file created for reading only
+    my_file.open("course_marks.dat"); // opens a file
 
     //Check that the file is open before proceeding
     if(!my_file.good()){
@@ -91,71 +100,49 @@ int main(){
         return 1; 
     }
 
-    vector<double> values;
-    vector<string> course_names;
-    vector<Course*> total_course_data; 
-    string course_name;
-    double mark;
-    int code;
-
     // write the marks into a new vector.
     while(my_file >> mark >> code){
-    getline(my_file, course_name);  // read rest of line
-    values.push_back(mark);
-    course_names.push_back(course_name);
-    total_course_data.push_back(new Course(course_name, mark)); // <- use course_name, not vector
-}
+        getline(my_file, course_name); 
+        values.push_back(mark);
+        course_names.push_back(course_name);
+        total_course_data.push_back(new Course(course_name, mark));
+    }
 
     // counts and prints number of entries in the open file 
     int number_of_entries{count_entries(values)};
     cout<<"Number of entries:"<<number_of_entries<<endl;
 
-
-    string sort_choice;
-    cout << "Do you want to order the marks by course name? (y/n): ";
-    cin >> sort_choice;
-    
-    // Ask if the user wants to sort
-    string sort_total_choice;
+    // Ask if the user wants to sort data by course name, alphabetically
     cout << "Do you want to order the total marks by course name? (y/n): ";
-    cin >> sort_total_choice;
+    cin >> total_sort_choice;
 
-    if (sort_total_choice == "y" || sort_total_choice == "Y") {
+    // orders the data if the user has selected y or Y
+    if (total_sort_choice == "y" || total_sort_choice == "Y") {
         sort(total_course_data.begin(), total_course_data.end(), order_entries);
+        cout << "Grades (sorted):";
     }
 
-    // Display
+    // the data is not sorted if the user has selected n or N
+    else if (total_sort_choice == "n" || total_sort_choice == "N") {
+        cout << "Grades:";
+    }
+
+    else {
+        cout << "Invalid choice. Displaying unsorted grades." << endl;
+    }
+
+    // prints out the data, sorted or unsorted depending in the user's choice
     for (Course* c : total_course_data) {
         cout << c->get_mark() << " - " << c->get_name() << endl;
-    }
+}
+
+    // calculate and print mean value
+    double total_stats{stats(values, number_of_entries)};
 
     // Clean up memory
     for (Course* c : total_course_data) {
         delete c;
     }
-
-    if (sort_total_choice == "y" || sort_total_choice == "Y") {
-    sort(total_course_data.begin(), total_course_data.end(), order_entries);
-    cout << "Grades (sorted):";
-        for (int i = 0; i < number_of_entries; ++i) {
-            cout << values[i] << " - " << course_names[i] << endl;
-        }
-    }
-    else if (sort_total_choice == "n" || sort_total_choice == "N") {
-        cout << "Grades:";
-        for (int i = 0; i < number_of_entries; ++i) {
-            cout << values[i] << endl;
-        }
-    }
-    else {
-        cout << "Invalid choice. Displaying unsorted grades." << endl;
-        for (int i = 0; i < number_of_entries; ++i) {
-            cout << values[i] << endl;
-        }
-    }
-
-    // calculate and print mean value, the grades are stored in the first column of the file, so we access it using my_file[0]
-    double total_stats{stats(values, number_of_entries)};
 
     my_file.clear();
     my_file.seekg(0);
@@ -169,82 +156,66 @@ int main(){
     double year_mark;
     int year_code;
     string year_course_name;
+    string year_sort_choice;
 
-    // ask what year we want the stats for, and print the stats for that year
+    //ask what year we want the stats for, and print the stats for that year
     int year;
     cout<<"Enter year (1-4) to get stats for that year:"<<endl;
     cin>>year;
 
-    string year_sort_choice;
     cout << "Do you want to order the marks by course name? (y/n): ";
     cin >> year_sort_choice;
-
-
-    // ask the user if they want course names included for the year stats
-    string year_include_courses;
-    cout << "Do you want to include course names when displaying results? (y/n): ";
-    cin >> year_include_courses;
-
 
     // select the data for the selected year and store it in a new vector
     while(my_file >> year_mark >> year_code){
 
-    int first_digit = year_code / 10000;
-
-    if(first_digit == year){
-        year_values.push_back(year_mark);
+        int first_digit = year_code / 10000;
         getline(my_file, year_course_name);
-        year_course_names.push_back(year_course_name);
-        year_data.push_back(new Course(year_course_name, year_mark));
-    }
 
-    getline(my_file, year_course_name);
-}
+        if(first_digit == year){
+            getline(my_file, year_course_name);
+            year_values.push_back(year_mark);
+            year_course_names.push_back(year_course_name);
+            year_data.push_back(new Course(year_course_name, year_mark));
+        }
+    }
 
     if (year_data.empty()){
-    cout << "No data found for year " << year << endl;
-    return 1;
-}
+        cout << "No data found for year " << year << endl;
+        return 1;
+    }
 
-    sort(year_data.begin(), year_data.end(), order_entries);
+    if (year_sort_choice == "y" || year_sort_choice == "Y") {
+        sort(year_data.begin(), year_data.end(), order_entries);
+        cout << "Grades with course names:";
+    }
 
-    for (const Course* c : year_data)
-    {
+    else if (year_sort_choice == "n" || year_sort_choice == "N"){
+        cout << "Grades for year " << year << ":";
+        
+    }
+
+    else {
+        cout << "Invalid choice. Displaying unsorted grades." << endl;
+    }
+
+    // print the data for the selected year, sorted or unsorted depending on the user's choice
+    for (Course* c : year_data) {
         cout << c->get_mark() << " - " << c->get_name() << endl;
     }
-
-    for (Course* c : year_data)
-        delete c;
-
-
-    if (year_include_courses == "y" || year_include_courses == "Y") {
-    cout << "Grades with course names:";
-    for (const Course* c : year_data) {
-        cout << c->get_mark() << " - "<< c->get_name() << endl;
-    }
-}
-else {
-    cout << "Grades for year " << year << ":";
-    for (const Course* c : year_data) {
-        cout << c->get_mark() << endl;
-    }
-}
 
     // calulate number of entries for that year
     int year_entries{count_entries(year_values)};
 
-    // calculate and print mean value, the grades are stored in the first column of the file, so we access it using my_file[0]
-    double year_mean_val{mean(year_values, year_entries)};
-    cout<<"Year "<<year<<" Mean:"<<year_mean_val<<endl;
+    // print stats for the year
+    double year_stats(stats(year_values, year_entries));
 
-    // calculate and print standard deviation
-    double year_std_dev{standard_deviation(year_values, year_entries)};
-    cout<<"Year "<<year<<" Standard Deviation:"<<year_std_dev<<endl;
-
-    // calculate and print standard error
-    double year_std_err{standard_error(year_values, year_entries)};
-    cout<<"Year "<<year<<" Standard Error:"<<year_std_err<<endl;
-
+    // clean up memory
+    for (Course* c : year_data)
+        delete c;
+    
+    // close the file
+    my_file.close();
 
     return 0;
 
