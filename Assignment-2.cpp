@@ -173,7 +173,6 @@ int main(){
         getline(my_file, year_course_name);
 
         if(first_digit == year){
-            getline(my_file, year_course_name);
             year_values.push_back(year_mark);
             year_course_names.push_back(year_course_name);
             year_data.push_back(new Course(year_course_name, year_mark));
