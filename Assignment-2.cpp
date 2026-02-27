@@ -59,11 +59,13 @@ public:
     Course(string n, double m)
         : name(n), mark(m) {}
 
+    // returns course name
     string get_name() const
     {
         return name;
     }
 
+    //returns course mark
     double get_mark() const
     {
         return mark;
@@ -71,10 +73,9 @@ public:
 };
 
 
-
-bool order_entries(const Course* a,
-                   const Course* b)
-{
+bool order_entries(const Course* a, const Course* b){
+                    // 'a' is the pointer to first course and 'b' is the pointer the the second course
+                    // if 'a' should appear before 'b', return true, otherwise return false
     return a->get_name() < b->get_name();
 }
 
@@ -150,6 +151,7 @@ int main(){
 
     //------------ stats for a specific year --------------
 
+    // set up constants for the year stats
     vector<double> year_values;
     vector<string> year_course_names;
     vector<Course*> year_data;
@@ -157,9 +159,9 @@ int main(){
     int year_code;
     string year_course_name;
     string year_sort_choice;
-
-    //ask what year we want the stats for, and print the stats for that year
     int year;
+
+    // ask what year we want the stats for, and print the stats for that year
     cout<<"Enter year (1-4) to get stats for that year:"<<endl;
     cin>>year;
 
